@@ -1,4 +1,4 @@
-name: Deploy platform and plugin files to the CyberArk Vault on release
+name: Deploy platform to CyberArk on release
 
 on:
   release:
