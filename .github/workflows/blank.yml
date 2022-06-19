@@ -31,7 +31,7 @@ jobs:
         shell: powershell
         run: |
           $env:HOMEDRIVE = ""
-          $env:HomePath = ${{ runner.temp }}
+          $env:HomePath = "${{ runner.temp }}"
           Import-Module PoShPACLI
           $VaultCredential = New-Object System.Management.Automation.PSCredential ("Administrator", (ConvertTo-SecureString -String ${{ secrets.VAULT_PASSWORD }} -AsPlainText -Force))
           . .\Update-PASPlatformFiles
