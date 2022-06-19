@@ -30,9 +30,7 @@ jobs:
       - name: Uploads CPM files to the Vault
         shell: powershell
         run: |
-          $VaultPassword =  "${{ secrets.VAULT_PASSWORD }}"
-          $VaultCredentialPassword = ConvertTo-SecureString -String $VaultPassword -AsPlainText -Force
-          $VaultCredential = New-Object System.Management.Automation.PSCredential (Administrator, $VaultCredentialPassword)
+          $VaultCredential = New-Object System.Management.Automation.PSCredential ("Administrator", ConvertTo-SecureString -String ${{ secrets.VAULT_PASSWORD }} -AsPlainText -Force)
           . .\Update-PASPlatformFiles
           Update-PASPlatformFiles `
             -PacliClientPath C:\PACLI\Pacli.exe `
