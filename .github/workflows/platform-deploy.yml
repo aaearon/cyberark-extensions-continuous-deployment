@@ -3,6 +3,8 @@ name: Deploy platform to CyberArk on release
 on:
   release:
     types: [published]
+  push:
+    branches: [ "develop" ]
   workflow_dispatch:
 
 jobs:
