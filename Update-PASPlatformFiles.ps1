@@ -54,7 +54,7 @@ function Update-PoliciesXml {
     $PVWASettingsXml = [xml](Get-Content $PVWASettingsFile)
 
     # Search via PlatformId as it could be a Policy, Usage, whatever.
-    $ExistingPolicyElement = $PoliciesXml.SelectNodes("//*[@ID='$PlatformId']")
+    $ExistingPolicyElement = $PoliciesXml.SelectSingleNode("//*[@ID='$PlatformId']")
     # Import the Policy element from the PVWASettingsFile to the PoliciesXml document.
     $NewPolicyElement = $PoliciesXml.ImportNode($PVWASettingsXml.SelectSingleNode("//*[@ID='$PlatformId']"), $true)
 
