@@ -56,7 +56,7 @@ function Update-PoliciesXml {
     # Search via PlatformId as it could be a Policy, Usage, whatever.
     $ExistingPolicyElement = $PoliciesXml.SelectNodes("//*[@ID='$PlatformId']")
     # Import the Policy element from the PVWASettingsFile to the PoliciesXml document.
-    $NewPolicyElement = $PoliciesXml.ImportNode($PVWASettingsXml.SelectSingleNode("//*[@ID='$PlatformId']"))
+    $NewPolicyElement = $PoliciesXml.ImportNode($PVWASettingsXml.SelectSingleNode("//*[@ID='$PlatformId']"), $true)
 
     # Add the new policy element we imported, replace the old one.
     # Can this be done better with .ReplaceChild()?
