@@ -32,9 +32,58 @@ Describe 'Update-PASPlatformFiles' {
         Out-File -FilePath (Join-Path -Path $PlatformDirectory -ChildPath "$($PlatformId)Prompts.ini") -Force
 
     }
-    It 'assumes the PlatformID based on the directory name' -Skip {
+    It 'assumes the PlatformID based on the directory name' {
+        Mock -CommandName Update-PoliciesXml
 
+        Update-PASPlatformFiles `
+            -PacliClientPath C:\PACLI\Pacli.exe `
+            -VaultAddress 192.168.0.50 `
+            -VaultCredential $VaultCredential `
+            -PlatformFolder $PlatformDirectory
+
+        Should -Invoke -CommandName Add-PVFile -ParameterFilter {
+            $safe -eq 'PasswordManagerShared' -and
+            $folder -eq 'root\Policies' -and
+            $file -eq "Policy-$PlatformId.ini" -and
+            $localFolder -eq $PlatformDirectory -and
+            $localFile -eq "Policy-$PlatformId.ini"
+        }
     }
+
+    It 'takes a list of platform folders and updates the files' {
+        Mock -CommandName Update-PoliciesXml
+
+        # Create a second dummy platform and structure for the test
+        $PlatformId2 = 'SamplePlatform2'
+        $PlatformDirectory2 = New-Item -Path (Join-Path -Path $TestDrive -ChildPath $PlatformId2) -ItemType Directory
+        # Create the required parts of a platform
+        $PlatformCPMPolicyFile2 = Join-Path -Path $PlatformDirectory2 -ChildPath "Policy-$PlatformId2.ini"
+        Out-File -FilePath $PlatformCPMPolicyFile2 -Force
+        $PlatformPVWASettingsFile2 = Join-Path -Path $PlatformDirectory2 -ChildPath "Policy-$PlatformId2.xml"
+        Out-File -FilePath $PlatformPVWASettingsFile2 -Force
+
+        @($PlatformDirectory, $PlatformDirectory2) | Update-PASPlatformFiles `
+            -PacliClientPath C:\PACLI\Pacli.exe `
+            -VaultAddress 192.168.0.50 `
+            -VaultCredential $VaultCredential `
+
+        Should -Invoke -CommandName Add-PVFile -ParameterFilter {
+            $safe -eq 'PasswordManagerShared' -and
+            $folder -eq 'root\Policies' -and
+            $file -eq "Policy-$PlatformId.ini" -and
+            $localFolder -eq $PlatformDirectory -and
+            $localFile -eq "Policy-$PlatformId.ini"
+        }
+
+        Should -Invoke -CommandName Add-PVFile -ParameterFilter {
+            $safe -eq 'PasswordManagerShared' -and
+            $folder -eq 'root\Policies' -and
+            $file -eq "Policy-$PlatformId2.ini" -and
+            $localFolder -eq $PlatformDirectory2 -and
+            $localFile -eq "Policy-$PlatformId2.ini"
+        }
+    }
+
     Context 'when updating existing platforms' {
 
         It 'must add the CPM policy file to the Vault' {
