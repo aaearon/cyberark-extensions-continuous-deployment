@@ -45,8 +45,6 @@ Describe 'Update-PASPlatformFiles' {
                 -VaultAddress 192.168.0.50 `
                 -VaultCredential $VaultCredential `
                 -PlatformId $PlatformId `
-                -CPMPolicyFile $PlatformCPMPolicyFile `
-                -PVWASettingsFile $PlatformPVWASettingsFile `
                 -PlatformFolder $PlatformDirectory
 
             Should -Invoke -CommandName Add-PVFile -ParameterFilter {
@@ -65,8 +63,6 @@ Describe 'Update-PASPlatformFiles' {
                 -VaultAddress 192.168.0.50 `
                 -VaultCredential $VaultCredential `
                 -PlatformId $PlatformId `
-                -CPMPolicyFile $PlatformCPMPolicyFile `
-                -PVWASettingsFile $PlatformPVWASettingsFile `
                 -PlatformFolder $PlatformDirectory
 
             Should -Invoke -CommandName Add-PVFile -ParameterFilter {
@@ -93,8 +89,6 @@ Describe 'Update-PASPlatformFiles' {
                 -VaultAddress 192.168.0.50 `
                 -VaultCredential $VaultCredential `
                 -PlatformId $PlatformId `
-                -CPMPolicyFile $PlatformCPMPolicyFile `
-                -PVWASettingsFile $PlatformPVWASettingsFile `
                 -PlatformFolder $PlatformDirectory
 
             Should -Invoke -CommandName Update-PoliciesXml -ParameterFilter {

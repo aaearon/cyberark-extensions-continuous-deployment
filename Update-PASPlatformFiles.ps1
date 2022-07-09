@@ -6,8 +6,6 @@ function Update-PASPlatformFiles {
         $VaultAddress,
         $VaultCredential,
         $PlatformId,
-        $CPMPolicyFile,
-        $PVWASettingsFile,
 
         [Parameter(Mandatory = $true)]
         [string]
