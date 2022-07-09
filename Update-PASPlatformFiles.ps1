@@ -25,7 +25,7 @@ function Update-PASPlatformFiles {
             if ($File.Name -eq (Get-ChildItem $CPMPolicyFile).Name) {
                 Add-PVFile -safe PasswordManagerShared -folder root\Policies -file $File.Name -localFolder $File.DirectoryName -localFile $File.Name
             } elseif ($File.Name -eq (Get-ChildItem $PVWASettingsFile).Name) {
-               # Do something some day? Download Policies.xml, replace what is in Policies.xml with what is in PVWASettingsFile, then upload?
+                Update-PoliciesXml -PVWASettingsFile $PVWASettingsFile -PlatformId $PlatformId
             } else {
                 Add-PVFile -safe PasswordManagerShared -folder root\ImportedPlatforms\Policy-$PlatformId -file $File.Name -localFolder $File.DirectoryName -localFile $File.Name
             }
@@ -37,4 +37,34 @@ function Update-PASPlatformFiles {
         Disconnect-PVVault
         Stop-PVPacli
     }
+}
+
+function Update-PoliciesXml {
+    param (
+        $PVWASettingsFile,
+        $PlatformId
+    )
+
+    $TemporaryFile = New-TemporaryFile
+
+    Open-PVSafe -safe PVWAConfig
+    Get-PVFile -safe PVWAConfig -folder root -file Policies.xml -localFolder $TemporaryFile.DirectoryName -localFile $TemporaryFile.Name
+
+    $PoliciesXml =  [xml](Get-Content $TemporaryFile)
+    $PVWASettingsXml = [xml](Get-Content $PVWASettingsFile)
+
+    # Search via PlatformId as it could be a Policy, Usage, whatever.
+    $ExistingPolicyElement = $PoliciesXml.SelectSingleNode("//*[@ID='$PlatformId']")
+    # Import the Policy element from the PVWASettingsFile to the PoliciesXml document.
+    $NewPolicyElement = $PoliciesXml.ImportNode($PVWASettingsXml.SelectSingleNode("//*[@ID='$PlatformId']"), $true)
+
+    # Add the new policy element we imported, replace the old one.
+    # Can this be done better with .ReplaceChild()?
+    $ExistingPolicyElement.ParentNode.AppendChild($NewPolicyElement)
+    $ExistingPolicyElement.ParentNode.RemoveChild($ExistingPolicyElement)
+
+    $PoliciesXml.Save($TemporaryFile.FullName)
+
+    Add-PVFile -safe PVWAConfig -folder root -file 'Policies.xml' -localFolder $TemporaryFile.DirectoryName -localFile $TemporaryFile.Name
+    Close-PVSafe -safe PVWAConfig
 }
