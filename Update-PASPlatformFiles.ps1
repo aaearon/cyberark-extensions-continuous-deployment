@@ -1,4 +1,5 @@
-﻿
+﻿#requires -modules PoShPACLI
+
 function Update-PASPlatformFiles {
     param (
         $PacliClientPath,
@@ -7,7 +8,10 @@ function Update-PASPlatformFiles {
         $PlatformId,
         $CPMPolicyFile,
         $PVWASettingsFile,
-        $Path
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $PlatformFolder
     )
 
     begin {
@@ -19,19 +23,35 @@ function Update-PASPlatformFiles {
     }
 
     process {
-        $Files = Get-ChildItem -Path $Path
 
-        foreach ($File in $Files) {
-            if ($File.Name -eq (Get-ChildItem $CPMPolicyFile).Name) {
-                Add-PVFile -safe PasswordManagerShared -folder root\Policies -file $File.Name -localFolder $File.DirectoryName -localFile $File.Name
-            } elseif ($File.Name -eq (Get-ChildItem $PVWASettingsFile).Name) {
-                Update-PoliciesXml -PVWASettingsFile $PVWASettingsFile -PlatformId $PlatformId
-            } else {
+        $CPMPolicyFile = Join-Path -Path $PlatformFolder -ChildPath "Policy-$PlatformId.ini"
+        $PVWASettingsFile = Join-Path -Path $PlatformFolder -ChildPath "Policy-$PlatformId.xml"
+
+        if (Test-Path -Path $CPMPolicyFile) {
+            $CPMPolicyFile = Get-ChildItem $CPMPolicyFile
+            Add-PVFile -safe PasswordManagerShared -folder root\Policies -file $CPMPolicyFile.Name -localFolder $CPMPolicyFile.DirectoryName -localFile $CPMPolicyFile.Name
+        }
+        else {
+            throw "CPM policy file not found: Policy-$PlatformId.ini"
+        }
+
+        if (Test-Path -Path $PVWASettingsFile) {
+            $PVWASettingsFile = Get-ChildItem $PVWASettingsFile
+            Update-PoliciesXml -PVWASettingsFile $PVWASettingsFile.FullName -PlatformId $PlatformId
+        }
+        else {
+            throw "PVWA settings file not found: Policy-$PlatformId.xml"
+        }
+
+        foreach ($File in (Get-ChildItem -Path $PlatformFolder)) {
+            if ($File.Name -ne "Policy-$PlatformId.ini" -or $File.Name -ne "Policy-$PlatformId.xml") {
                 Add-PVFile -safe PasswordManagerShared -folder root\ImportedPlatforms\Policy-$PlatformId -file $File.Name -localFolder $File.DirectoryName -localFile $File.Name
+            }
+            else {
+                Write-Debug "Skipping file: $($File.Name)"
             }
         }
     }
-
     end {
         Close-PVSafe -safe PasswordManagerShared
         Disconnect-PVVault
@@ -50,7 +70,7 @@ function Update-PoliciesXml {
     Open-PVSafe -safe PVWAConfig
     Get-PVFile -safe PVWAConfig -folder root -file Policies.xml -localFolder $TemporaryFile.DirectoryName -localFile $TemporaryFile.Name
 
-    $PoliciesXml =  [xml](Get-Content $TemporaryFile)
+    $PoliciesXml = [xml](Get-Content $TemporaryFile)
     $PVWASettingsXml = [xml](Get-Content $PVWASettingsFile)
 
     # Search via PlatformId as it could be a Policy, Usage, whatever.

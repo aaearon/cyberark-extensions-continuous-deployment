@@ -47,7 +47,7 @@ Describe 'Update-PASPlatformFiles' {
                 -PlatformId $PlatformId `
                 -CPMPolicyFile $PlatformCPMPolicyFile `
                 -PVWASettingsFile $PlatformPVWASettingsFile `
-                -Path $PlatformDirectory
+                -PlatformFolder $PlatformDirectory
 
             Should -Invoke -CommandName Add-PVFile -ParameterFilter {
                 $safe -eq 'PasswordManagerShared' -and
@@ -67,7 +67,7 @@ Describe 'Update-PASPlatformFiles' {
                 -PlatformId $PlatformId `
                 -CPMPolicyFile $PlatformCPMPolicyFile `
                 -PVWASettingsFile $PlatformPVWASettingsFile `
-                -Path $PlatformDirectory
+                -PlatformFolder $PlatformDirectory
 
             Should -Invoke -CommandName Add-PVFile -ParameterFilter {
                 $safe -eq 'PasswordManagerShared' -and
@@ -95,11 +95,13 @@ Describe 'Update-PASPlatformFiles' {
                 -PlatformId $PlatformId `
                 -CPMPolicyFile $PlatformCPMPolicyFile `
                 -PVWASettingsFile $PlatformPVWASettingsFile `
-                -Path $PlatformDirectory
+                -PlatformFolder $PlatformDirectory
 
             Should -Invoke -CommandName Update-PoliciesXml -ParameterFilter {
                 $PVWASettingsFile -eq $PlatformPVWASettingsFile -and
-                $PlatformId -eq $PlatformId }
+                $PesterBoundParameters.PlatformId -eq $PlatformId
+            }
+
         }
         It 'must add the new Policies.xml to the Vault' -Skip {
             Should -Invoke -CommandName  Add-PVFile -ParameterFilter {
