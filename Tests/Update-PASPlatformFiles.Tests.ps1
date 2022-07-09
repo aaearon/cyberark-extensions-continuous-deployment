@@ -57,6 +57,34 @@ Describe 'Update-PASPlatformFiles' {
                 $localFile -eq "Policy-$PlatformId.ini"
             }
         }
+        It 'must add any optional files to the Vault' {
+            Mock -CommandName Update-PoliciesXml
+
+            Update-PASPlatformFiles `
+                -PacliClientPath C:\PACLI\Pacli.exe `
+                -VaultAddress 192.168.0.50 `
+                -VaultCredential $VaultCredential `
+                -PlatformId $PlatformId `
+                -CPMPolicyFile $PlatformCPMPolicyFile `
+                -PVWASettingsFile $PlatformPVWASettingsFile `
+                -Path $PlatformDirectory
+
+            Should -Invoke -CommandName Add-PVFile -ParameterFilter {
+                $safe -eq 'PasswordManagerShared' -and
+                $folder -eq "root\ImportedPlatforms\Policy-$PlatformId" -and
+                $file -eq "$($PlatformId)Process.ini" -and
+                $localFolder -eq $PlatformDirectory -and
+                $localFile -eq "$($PlatformId)Process.ini"
+            }
+
+            Should -Invoke -CommandName Add-PVFile -ParameterFilter {
+                $safe -eq 'PasswordManagerShared' -and
+                $folder -eq "root\ImportedPlatforms\Policy-$PlatformId" -and
+                $file -eq "$($PlatformId)Prompts.ini" -and
+                $localFolder -eq $PlatformDirectory -and
+                $localFile -eq "$($PlatformId)Prompts.ini"
+            }
+        }
         It 'must merge the PVWA settings file into Policies.xml' {
             Mock -CommandName Update-PoliciesXml
 
