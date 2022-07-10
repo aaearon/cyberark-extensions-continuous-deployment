@@ -35,11 +35,7 @@ Describe 'Update-PASPlatformFiles' {
     It 'assumes the PlatformID based on the directory name' {
         Mock -CommandName Update-PoliciesXml
 
-        Update-PASPlatformFiles `
-            -PacliClientPath C:\PACLI\Pacli.exe `
-            -VaultAddress 192.168.0.50 `
-            -VaultCredential $VaultCredential `
-            -Path $PlatformDirectory
+        Update-PASPlatformFiles -Path $PlatformDirectory
 
         Should -Invoke -CommandName Add-PVFile -ParameterFilter {
             $safe -eq 'PasswordManagerShared' -and
@@ -62,10 +58,7 @@ Describe 'Update-PASPlatformFiles' {
         $PlatformPVWASettingsFile2 = Join-Path -Path $PlatformDirectory2 -ChildPath "Policy-$PlatformId2.xml"
         Out-File -FilePath $PlatformPVWASettingsFile2 -Force
 
-        (Get-ChildItem $TestDrive).FullName | Update-PASPlatformFiles `
-            -PacliClientPath C:\PACLI\Pacli.exe `
-            -VaultAddress 192.168.0.50 `
-            -VaultCredential $VaultCredential `
+        (Get-ChildItem $TestDrive).FullName | Update-PASPlatformFiles
 
         Should -Invoke -CommandName Add-PVFile -ParameterFilter {
             $safe -eq 'PasswordManagerShared' -and
@@ -89,12 +82,7 @@ Describe 'Update-PASPlatformFiles' {
         It 'must add the CPM policy file to the Vault' {
             Mock -CommandName Update-PoliciesXml
 
-            Update-PASPlatformFiles `
-                -PacliClientPath C:\PACLI\Pacli.exe `
-                -VaultAddress 192.168.0.50 `
-                -VaultCredential $VaultCredential `
-                -PlatformId $PlatformId `
-                -Path $PlatformDirectory
+            Update-PASPlatformFiles -PlatformId $PlatformId -Path $PlatformDirectory
 
             Should -Invoke -CommandName Add-PVFile -ParameterFilter {
                 $safe -eq 'PasswordManagerShared' -and
@@ -107,12 +95,7 @@ Describe 'Update-PASPlatformFiles' {
         It 'must add any optional files to the Vault' {
             Mock -CommandName Update-PoliciesXml
 
-            Update-PASPlatformFiles `
-                -PacliClientPath C:\PACLI\Pacli.exe `
-                -VaultAddress 192.168.0.50 `
-                -VaultCredential $VaultCredential `
-                -PlatformId $PlatformId `
-                -Path $PlatformDirectory
+            Update-PASPlatformFiles -PlatformId $PlatformId -Path $PlatformDirectory
 
             Should -Invoke -CommandName Add-PVFile -ParameterFilter {
                 $safe -eq 'PasswordManagerShared' -and
@@ -133,12 +116,7 @@ Describe 'Update-PASPlatformFiles' {
         It 'must merge the PVWA settings file into Policies.xml' {
             Mock -CommandName Update-PoliciesXml
 
-            Update-PASPlatformFiles `
-                -PacliClientPath C:\PACLI\Pacli.exe `
-                -VaultAddress 192.168.0.50 `
-                -VaultCredential $VaultCredential `
-                -PlatformId $PlatformId `
-                -Path $PlatformDirectory
+            Update-PASPlatformFiles -PlatformId $PlatformId -Path $PlatformDirectory
 
             Should -Invoke -CommandName Update-PoliciesXml -ParameterFilter {
                 $PVWASettingsFile -eq $PlatformPVWASettingsFile -and
