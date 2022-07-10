@@ -8,7 +8,7 @@
 			</Required>
 			<Optional>
 				<Property Name="Banana" />
-			</Optional
+			</Optional>
 			</Properties>
 			<LinkedPasswords>
 				<Link Name="ReconcileAccount" DisplayName="Reconcile Account" PropertyIndex="3" />
