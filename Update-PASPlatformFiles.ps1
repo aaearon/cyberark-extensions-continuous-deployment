@@ -21,7 +21,6 @@ function Update-PASPlatformFiles {
 
     process {
 
-
             if ($null -eq $PlatformId -or $PlatformId -eq "") {
                 $PlatformId = (Get-Item $Path).Name
             }
