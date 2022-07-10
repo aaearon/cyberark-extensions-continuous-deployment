@@ -14,4 +14,6 @@ jobs:
       - name: Run all Pester tests
         shell: pwsh
         run: |
+          Install-Module -Name Pester -Force
+          Install-Module -Name PoshPacli -Force
           Invoke-Pester .\Tests\*.Tests.ps1 -Passthru
