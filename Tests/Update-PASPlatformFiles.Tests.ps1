@@ -62,7 +62,7 @@ Describe 'Update-PASPlatformFiles' {
         $PlatformPVWASettingsFile2 = Join-Path -Path $PlatformDirectory2 -ChildPath "Policy-$PlatformId2.xml"
         Out-File -FilePath $PlatformPVWASettingsFile2 -Force
 
-        @($PlatformDirectory, $PlatformDirectory2) | Update-PASPlatformFiles `
+        (Get-ChildItem $TestDrive).FullName | Update-PASPlatformFiles `
             -PacliClientPath C:\PACLI\Pacli.exe `
             -VaultAddress 192.168.0.50 `
             -VaultCredential $VaultCredential `
