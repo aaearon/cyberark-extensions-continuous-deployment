@@ -19,13 +19,5 @@ jobs:
         run: |
           $env:HOMEDRIVE = ""
           $env:HomePath = "${{ runner.temp }}"
-          Import-Module PoShPACLI
           $VaultCredential = New-Object System.Management.Automation.PSCredential ("Administrator", (ConvertTo-SecureString -String ${{ secrets.VAULT_PASSWORD }} -AsPlainText -Force))
-          . .\Update-PASPlatformFiles
-          Set-PVConfiguration -ClientPath C:\PACLI\Pacli.exe
-          Start-PVPacli
-          New-PVVaultDefinition -vault 192.168.0.50 -address 192.168.0.50
-          Connect-PVVault -user $($VaultCredential.UserName) -password $($VaultCredential.Password)
-          (Get-ChildItem .\platforms\).FullName | Update-PASPlatformFiles
-          Disconnect-PVVault
-          Stop-PVPacli
+          .\deploy.ps1 -PACLIClientPath 'C:\PACLI\Pacli.exe' -VaultCredential $VaultCredential -VaultAddress 192.168.0.50 -BasePlatformFolder '.\platforms\'
