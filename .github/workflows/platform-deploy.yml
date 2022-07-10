@@ -26,7 +26,4 @@ jobs:
             -PacliClientPath C:\PACLI\Pacli.exe `
             -VaultAddress 192.168.0.50 `
             -VaultCredential $VaultCredential `
-            -PlatformId RealVNCServiceMode `
-            -CPMPolicyFile .\platforms\RealVNCServiceMode\Policy-RealVNCServiceMode.ini `
-            -PVWASettingsFile .\platforms\RealVNCServiceMode\Policy-RealVNC.xml `
             -Path .\platforms\RealVNCServiceMode
