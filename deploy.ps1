@@ -11,7 +11,7 @@ Import-Module PoShPACLI
 
 Set-PVConfiguration -ClientPath $PACLIClientPath
 Start-PVPacli
-New-PVVaultDefinition -vault $VaultAddress -address $VaultAddress
+New-PVVaultDefinition -vault $VaultAddress -address $VaultAddress -ErrorAction SilentlyContinue
 Connect-PVVault -user $($VaultCredential.UserName) -password $($VaultCredential.Password)
 
 (Get-ChildItem $BasePlatformFolder).FullName | Update-PASPlatformFiles
