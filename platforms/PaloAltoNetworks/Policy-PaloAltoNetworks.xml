@@ -1,0 +1,23 @@
+<Device Name="Network Device">
+	<Policies>
+		<Policy ID="PaloAltoNetworks" PlatformBaseID="PaloAltoNetworks" PlatformBaseType="Unix" PlatformBaseProtocol="SSH" AutoChangeOnAdd="No" AutoVerifyOnAdd="No">
+			<Properties>
+			<Required>
+			  <Property Name="Username" />
+			  <Property Name="Address" />
+			</Required>
+			<Optional>
+				<Property Name="Banana" />
+				<Property Name="Description" />
+			</Optional>
+			</Properties>
+			<LinkedPasswords>
+				<Link Name="ReconcileAccount" DisplayName="Reconcile Account" PropertyIndex="3" />
+			</LinkedPasswords>
+			<ConnectionComponents>
+				<ConnectionComponent Id="PSM-SSH"/>
+			</ConnectionComponents>
+			<TicketingSystem EnterTicketingInfo="No" ValidateTicketNumber="No" />
+		</Policy>
+	</Policies>
+</Device>
