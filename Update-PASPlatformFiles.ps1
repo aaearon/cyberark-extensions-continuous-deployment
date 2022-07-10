@@ -49,13 +49,19 @@ function Update-PASPlatformFiles {
             throw "PVWA settings file not found: Policy-$PlatformId.xml"
         }
 
-        foreach ($File in (Get-ChildItem -Path $Path)) {
-            if ($File.Name -ne "Policy-$PlatformId.ini" -or $File.Name -ne "Policy-$PlatformId.xml") {
-                Add-PVFile -safe PasswordManagerShared -folder root\ImportedPlatforms\Policy-$PlatformId -file $File.Name -localFolder $File.DirectoryName -localFile $File.Name
+        $PlatformWasImported = Get-PVFolder -safe PasswordManagerShared | Where-Object { $_.Folder -eq "Root\ImportedPlatforms\Policy-$PlatformId" }
+        if ($PlatformWasImported) {
+            foreach ($File in (Get-ChildItem -Path $Path)) {
+                if ($File.Name -ne "Policy-$PlatformId.ini" -or $File.Name -ne "Policy-$PlatformId.xml") {
+                    Add-PVFile -safe PasswordManagerShared -folder root\ImportedPlatforms\Policy-$PlatformId -file $File.Name -localFolder $File.DirectoryName -localFile $File.Name
+                }
+                else {
+                    Write-Debug "Skipping file $($File.Name) as it was already added."
+                }
             }
-            else {
-                Write-Debug "Skipping file: $($File.Name)"
-            }
+        }
+        else {
+            Write-Warning "Platform $PlatformId does not have a folder under Root\ImportedPlatforms. Skipping optional files."
         }
 
         Clear-Variable -Name PlatformId # TODO: I don't think this should be necessary

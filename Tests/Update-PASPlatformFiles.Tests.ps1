@@ -8,6 +8,10 @@
     Mock -CommandName Add-PVFile
     Mock -CommandName Close-PVSafe
     Mock -CommandName Find-PVFile -MockWith { $true }
+    Mock -CommandName Get-PVFolder -MockWith { return [PSCustomObject]@{
+            Folder = "Root\ImportedPlatforms\Policy-$PlatformId"
+        }
+    }
 }
 
 Describe 'Update-PASPlatformFiles' {
@@ -104,6 +108,32 @@ Describe 'Update-PASPlatformFiles' {
                 $localFile -eq "$($PlatformId)Prompts.ini"
             }
         }
+
+        It 'does not add optional files to the Vault if the platform was not imported' {
+            Mock -CommandName Get-PVFolder -MockWith { $null }
+            Mock -CommandName Write-Warning
+
+            Update-PASPlatformFiles -PlatformId $PlatformId -Path $PlatformDirectory
+
+            Should -Not -Invoke -CommandName Add-PVFile -ParameterFilter {
+                $safe -eq 'PasswordManagerShared' -and
+                $folder -eq "root\ImportedPlatforms\Policy-$PlatformId" -and
+                $file -eq "$($PlatformId)Process.ini" -and
+                $localFolder -eq $PlatformDirectory -and
+                $localFile -eq "$($PlatformId)Process.ini"
+            }
+
+            Should -Not -Invoke -CommandName Add-PVFile -ParameterFilter {
+                $safe -eq 'PasswordManagerShared' -and
+                $folder -eq "root\ImportedPlatforms\Policy-$PlatformId" -and
+                $file -eq "$($PlatformId)Prompts.ini" -and
+                $localFolder -eq $PlatformDirectory -and
+                $localFile -eq "$($PlatformId)Prompts.ini"
+            }
+
+            Should -Invoke -CommandName Write-Warning
+        }
+
         It 'must merge the PVWA settings file into Policies.xml' {
             Update-PASPlatformFiles -PlatformId $PlatformId -Path $PlatformDirectory
 
