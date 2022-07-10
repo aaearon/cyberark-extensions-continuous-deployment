@@ -1,0 +1,20 @@
+<Device Name="Application">
+	<Policies>
+		<Policy ID="RealVNCServiceMode"  PlatformBaseID="NA" PlatformBaseType="NA" PlatformBaseProtocol="PowerShell" AutoChangeOnAdd="No" AutoVerifyOnAdd="No">
+			<Properties>
+				<Required>
+					<Property Name="Username" DisplayName="Real VNC" />
+					<Property Name="Address" />
+				</Required>
+				<Optional>
+					<Property Name="Banana" />
+					<Property Name="Description" />
+				</Optional>
+			</Properties>
+			<LinkedPasswords>
+				<Link Name="ReconcileAccount" PropertyIndex="3"/>
+			</LinkedPasswords>
+			<TicketingSystem EnterTicketingInfo="No" ValidateTicketNumber="No" />
+		</Policy>
+	</Policies>
+</Device>
