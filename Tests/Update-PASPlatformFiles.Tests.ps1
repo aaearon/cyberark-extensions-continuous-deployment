@@ -1,18 +1,13 @@
 ﻿BeforeAll {
     . $PSScriptRoot\..\Update-PASPlatformFiles.ps1
 
-    Mock -CommandName Test-Path -MockWith { return $true }
-    Mock -CommandName Set-PVConfiguration
-    Mock -CommandName Start-PVPacli
-    Mock -CommandName New-PVVaultDefinition
-    Mock -CommandName Connect-PVVault
+    Mock -CommandName Update-PoliciesXml
+    Mock -CommandName Get-PVFile
+
     Mock -CommandName Open-PVSafe
     Mock -CommandName Add-PVFile
     Mock -CommandName Close-PVSafe
-    Mock -CommandName Disconnect-PVVault
-    Mock -CommandName Stop-PVPacli
-
-    Mock -CommandName Get-PVFile
+    Mock -CommandName Find-PVFile -MockWith { $true }
 
     $VaultCredential = New-Object System.Management.Automation.PSCredential ('username', (ConvertTo-SecureString -String 'password' -AsPlainText -Force))
 }
@@ -33,8 +28,6 @@ Describe 'Update-PASPlatformFiles' {
 
     }
     It 'assumes the PlatformID based on the directory name' {
-        Mock -CommandName Update-PoliciesXml
-
         Update-PASPlatformFiles -Path $PlatformDirectory
 
         Should -Invoke -CommandName Add-PVFile -ParameterFilter {
@@ -47,8 +40,6 @@ Describe 'Update-PASPlatformFiles' {
     }
 
     It 'takes a list of platform folders and updates the files' {
-        Mock -CommandName Update-PoliciesXml
-
         # Create a second dummy platform and structure for the test
         $PlatformId2 = 'SamplePlatform2'
         $PlatformDirectory2 = New-Item -Path (Join-Path -Path $TestDrive -ChildPath $PlatformId2) -ItemType Directory
@@ -79,9 +70,13 @@ Describe 'Update-PASPlatformFiles' {
 
     Context 'when updating existing platforms' {
 
-        It 'must add the CPM policy file to the Vault' {
-            Mock -CommandName Update-PoliciesXml
+        It 'must throw an exception if the platform is not found in the Vault' {
+            Mock -CommandName Find-PVFile -MockWith { $null }
 
+            { Update-PASPlatformFiles -PlatformId banana -Path $PlatformDirectory } | Should -throw "Platform banana not found in Vault. Aborting."
+        }
+
+        It 'must add the CPM policy file to the Vault' {
             Update-PASPlatformFiles -PlatformId $PlatformId -Path $PlatformDirectory
 
             Should -Invoke -CommandName Add-PVFile -ParameterFilter {
@@ -93,8 +88,6 @@ Describe 'Update-PASPlatformFiles' {
             }
         }
         It 'must add any optional files to the Vault' {
-            Mock -CommandName Update-PoliciesXml
-
             Update-PASPlatformFiles -PlatformId $PlatformId -Path $PlatformDirectory
 
             Should -Invoke -CommandName Add-PVFile -ParameterFilter {
@@ -114,8 +107,6 @@ Describe 'Update-PASPlatformFiles' {
             }
         }
         It 'must merge the PVWA settings file into Policies.xml' {
-            Mock -CommandName Update-PoliciesXml
-
             Update-PASPlatformFiles -PlatformId $PlatformId -Path $PlatformDirectory
 
             Should -Invoke -CommandName Update-PoliciesXml -ParameterFilter {
