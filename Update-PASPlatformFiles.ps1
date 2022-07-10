@@ -16,7 +16,7 @@ function Update-PASPlatformFiles {
             ValueFromPipeline = $true
         )]
         [string]
-        $PlatformFolder
+        $Path
     )
 
     begin {
@@ -31,11 +31,11 @@ function Update-PASPlatformFiles {
 
 
             if ($null -eq $PlatformId -or $PlatformId -eq "") {
-                $PlatformId = (Get-Item $PlatformFolder).Name
+                $PlatformId = (Get-Item $Path).Name
             }
 
-            $CPMPolicyFile = Join-Path -Path $PlatformFolder -ChildPath "Policy-$PlatformId.ini"
-            $PVWASettingsFile = Join-Path -Path $PlatformFolder -ChildPath "Policy-$PlatformId.xml"
+            $CPMPolicyFile = Join-Path -Path $Path -ChildPath "Policy-$PlatformId.ini"
+            $PVWASettingsFile = Join-Path -Path $Path -ChildPath "Policy-$PlatformId.xml"
 
             if (Test-Path -Path $CPMPolicyFile) {
                 $CPMPolicyFile = Get-Item $CPMPolicyFile
@@ -53,7 +53,7 @@ function Update-PASPlatformFiles {
                 throw "PVWA settings file not found: Policy-$PlatformId.xml"
             }
 
-            foreach ($File in (Get-ChildItem -Path $PlatformFolder)) {
+            foreach ($File in (Get-ChildItem -Path $Path)) {
                 if ($File.Name -ne "Policy-$PlatformId.ini" -or $File.Name -ne "Policy-$PlatformId.xml") {
                     Add-PVFile -safe PasswordManagerShared -folder root\ImportedPlatforms\Policy-$PlatformId -file $File.Name -localFolder $File.DirectoryName -localFile $File.Name
                 }

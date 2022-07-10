@@ -39,7 +39,7 @@ Describe 'Update-PASPlatformFiles' {
             -PacliClientPath C:\PACLI\Pacli.exe `
             -VaultAddress 192.168.0.50 `
             -VaultCredential $VaultCredential `
-            -PlatformFolder $PlatformDirectory
+            -Path $PlatformDirectory
 
         Should -Invoke -CommandName Add-PVFile -ParameterFilter {
             $safe -eq 'PasswordManagerShared' -and
@@ -94,7 +94,7 @@ Describe 'Update-PASPlatformFiles' {
                 -VaultAddress 192.168.0.50 `
                 -VaultCredential $VaultCredential `
                 -PlatformId $PlatformId `
-                -PlatformFolder $PlatformDirectory
+                -Path $PlatformDirectory
 
             Should -Invoke -CommandName Add-PVFile -ParameterFilter {
                 $safe -eq 'PasswordManagerShared' -and
@@ -112,7 +112,7 @@ Describe 'Update-PASPlatformFiles' {
                 -VaultAddress 192.168.0.50 `
                 -VaultCredential $VaultCredential `
                 -PlatformId $PlatformId `
-                -PlatformFolder $PlatformDirectory
+                -Path $PlatformDirectory
 
             Should -Invoke -CommandName Add-PVFile -ParameterFilter {
                 $safe -eq 'PasswordManagerShared' -and
@@ -138,7 +138,7 @@ Describe 'Update-PASPlatformFiles' {
                 -VaultAddress 192.168.0.50 `
                 -VaultCredential $VaultCredential `
                 -PlatformId $PlatformId `
-                -PlatformFolder $PlatformDirectory
+                -Path $PlatformDirectory
 
             Should -Invoke -CommandName Update-PoliciesXml -ParameterFilter {
                 $PVWASettingsFile -eq $PlatformPVWASettingsFile -and
