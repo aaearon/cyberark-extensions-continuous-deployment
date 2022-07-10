@@ -3,10 +3,6 @@
 function Update-PASPlatformFiles {
     [CmdletBinding()]
     param (
-        $PacliClientPath,
-        $VaultAddress,
-        $VaultCredential,
-
         [Parameter(Mandatory = $false)]
         [string]
         $PlatformId,
@@ -20,54 +16,47 @@ function Update-PASPlatformFiles {
     )
 
     begin {
-        Set-PVConfiguration -ClientPath $PacliClientPath
-        Start-PVPacli
-        New-PVVaultDefinition -vault $VaultAddress -address $VaultAddress -ErrorAction SilentlyContinue
-        Connect-PVVault -user $($VaultCredential.UserName) -password $($VaultCredential.Password)
         Open-PVSafe -safe PasswordManagerShared
     }
 
     process {
 
+        if ($null -eq $PlatformId -or $PlatformId -eq "") {
+            $PlatformId = (Get-Item $Path).Name
+        }
 
-            if ($null -eq $PlatformId -or $PlatformId -eq "") {
-                $PlatformId = (Get-Item $Path).Name
-            }
+        $CPMPolicyFile = Join-Path -Path $Path -ChildPath "Policy-$PlatformId.ini"
+        $PVWASettingsFile = Join-Path -Path $Path -ChildPath "Policy-$PlatformId.xml"
 
-            $CPMPolicyFile = Join-Path -Path $Path -ChildPath "Policy-$PlatformId.ini"
-            $PVWASettingsFile = Join-Path -Path $Path -ChildPath "Policy-$PlatformId.xml"
+        if (Test-Path -Path $CPMPolicyFile) {
+            $CPMPolicyFile = Get-Item $CPMPolicyFile
+            Add-PVFile -safe PasswordManagerShared -folder root\Policies -file $CPMPolicyFile.Name -localFolder $CPMPolicyFile.DirectoryName -localFile $CPMPolicyFile.Name
+        }
+        else {
+            throw "CPM policy file not found: Policy-$PlatformId.ini"
+        }
 
-            if (Test-Path -Path $CPMPolicyFile) {
-                $CPMPolicyFile = Get-Item $CPMPolicyFile
-                Add-PVFile -safe PasswordManagerShared -folder root\Policies -file $CPMPolicyFile.Name -localFolder $CPMPolicyFile.DirectoryName -localFile $CPMPolicyFile.Name
+        if (Test-Path -Path $PVWASettingsFile) {
+            $PVWASettingsFile = Get-Item $PVWASettingsFile
+            Update-PoliciesXml -PVWASettingsFile $PVWASettingsFile.FullName -PlatformId $PlatformId
+        }
+        else {
+            throw "PVWA settings file not found: Policy-$PlatformId.xml"
+        }
+
+        foreach ($File in (Get-ChildItem -Path $Path)) {
+            if ($File.Name -ne "Policy-$PlatformId.ini" -or $File.Name -ne "Policy-$PlatformId.xml") {
+                Add-PVFile -safe PasswordManagerShared -folder root\ImportedPlatforms\Policy-$PlatformId -file $File.Name -localFolder $File.DirectoryName -localFile $File.Name
             }
             else {
-                throw "CPM policy file not found: Policy-$PlatformId.ini"
+                Write-Debug "Skipping file: $($File.Name)"
             }
+        }
 
-            if (Test-Path -Path $PVWASettingsFile) {
-                $PVWASettingsFile = Get-Item $PVWASettingsFile
-                Update-PoliciesXml -PVWASettingsFile $PVWASettingsFile.FullName -PlatformId $PlatformId
-            }
-            else {
-                throw "PVWA settings file not found: Policy-$PlatformId.xml"
-            }
-
-            foreach ($File in (Get-ChildItem -Path $Path)) {
-                if ($File.Name -ne "Policy-$PlatformId.ini" -or $File.Name -ne "Policy-$PlatformId.xml") {
-                    Add-PVFile -safe PasswordManagerShared -folder root\ImportedPlatforms\Policy-$PlatformId -file $File.Name -localFolder $File.DirectoryName -localFile $File.Name
-                }
-                else {
-                    Write-Debug "Skipping file: $($File.Name)"
-                }
-            }
-
-            Clear-Variable -Name PlatformId # TODO: I don't think this should be necessary
+        Clear-Variable -Name PlatformId # TODO: I don't think this should be necessary
     }
     end {
         Close-PVSafe -safe PasswordManagerShared
-        Disconnect-PVVault
-        Stop-PVPacli
     }
 }
 
