@@ -1,21 +1,23 @@
 ﻿BeforeAll {
     . $PSScriptRoot\..\Update-PASPlatformFiles.ps1
 
-    Mock -CommandName Update-PoliciesXml
-    Mock -CommandName Get-PVFile
-
     Mock -CommandName Open-PVSafe
     Mock -CommandName Add-PVFile
     Mock -CommandName Close-PVSafe
-    Mock -CommandName Find-PVFile -MockWith { $true }
-    Mock -CommandName Get-PVFolder -MockWith { return [PSCustomObject]@{
-            Folder = "Root\ImportedPlatforms\Policy-$PlatformId"
-        }
-    }
+
 }
 
 Describe 'Update-PASPlatformFiles' {
     BeforeAll {
+        Mock -CommandName Update-PoliciesXml
+        Mock -CommandName Get-PVFile
+
+        Mock -CommandName Find-PVFile -MockWith { $true }
+        Mock -CommandName Get-PVFolder -MockWith { return [PSCustomObject]@{
+                Folder = "Root\ImportedPlatforms\Policy-$PlatformId"
+            }
+        }
+
         # Create a dummy platform and structure for the test
         $PlatformId = 'SamplePlatform'
         $PlatformDirectory = New-Item -Path (Join-Path -Path $TestDrive -ChildPath $PlatformId) -ItemType Directory
@@ -143,12 +145,33 @@ Describe 'Update-PASPlatformFiles' {
             }
 
         }
-        It 'must add the new Policies.xml to the Vault' -Skip {
-            Should -Invoke -CommandName  Add-PVFile -ParameterFilter {
-                $safe -eq 'PVWAConfig'
-                -and $folder -eq 'root'
-                -and $file -eq 'Policies.xml'
-            }
+    }
+}
+
+Describe 'Update-PoliciesXml' {
+    BeforeAll {
+        Mock -CommandName Get-PVFile
+        Mock -CommandName Get-Content -ParameterFilter {$Path -like '*.tmp' } -MockWith { return (Get-Content -Path 'Tests\Policies.xml') }
+
+    }
+    It 'validates that the platform exists in Policies.xml' {
+        { Update-PoliciesXml -PVWASettingsFile 'Tests\Policy-RealVNCServiceMode.xml' -PlatformId 'RealVNCServiceMode' } | Should -Not -throw "Platform RealVNCServiceMode not found in Policies.xml"
+
+        { Update-PoliciesXml -PVWASettingsFile 'Tests\Policy-RealVNCServiceMode.xml' -PlatformId 'RealVNCServiceModeNotExisting' } | Should -throw "Platform RealVNCServiceModeNotExisting not found in Policies.xml"
+    }
+
+    It 'replaces the platform content in Policies.xml with the content in the PVWA settings file' {
+        $PoliciesXml = Update-PoliciesXml -PVWASettingsFile 'Tests\Policy-RealVNCServiceMode.xml' -PlatformId 'RealVNCServiceMode'
+        (Select-Xml -Xml $PoliciesXml -XPath '//*[@ID="RealVNCServiceMode"]/Properties/Optional/Property[@Name="Banana"]')[0] | Should -Be $true
+    }
+
+    It 'adds the new Policies.xml to the Vault' {
+        Update-PoliciesXml -PVWASettingsFile 'Tests\Policy-RealVNCServiceMode.xml' -PlatformId 'RealVNCServiceMode'
+
+        Should -Invoke -CommandName Add-PVFile -ParameterFilter {
+            $safe -eq 'PVWAConfig' -and
+            $folder -eq 'root' -and
+            $file -eq 'Policies.xml'
         }
     }
 }

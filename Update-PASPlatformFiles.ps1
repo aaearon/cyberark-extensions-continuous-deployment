@@ -87,16 +87,22 @@ function Update-PoliciesXml {
 
     # Search via PlatformId as it could be a Policy, Usage, whatever.
     $ExistingPolicyElement = $PoliciesXml.SelectSingleNode("//*[@ID='$PlatformId']")
-    # Import the Policy element from the PVWASettingsFile to the PoliciesXml document.
-    $NewPolicyElement = $PoliciesXml.ImportNode($PVWASettingsXml.SelectSingleNode("//*[@ID='$PlatformId']"), $true)
+    if ($null -ne $ExistingPolicyElement) {
+        # Import the Policy element from the PVWASettingsFile to the PoliciesXml document.
+        $NewPolicyElement = $PoliciesXml.ImportNode($PVWASettingsXml.SelectSingleNode("//*[@ID='$PlatformId']"), $true)
 
-    # Add the new policy element we imported, replace the old one.
-    # Can this be done better with .ReplaceChild()?
-    $ExistingPolicyElement.ParentNode.AppendChild($NewPolicyElement)
-    $ExistingPolicyElement.ParentNode.RemoveChild($ExistingPolicyElement)
+        # Add the new policy element we imported, replace the old one.
+        # Can this be done better with .ReplaceChild()?
+        $ExistingPolicyElement.ParentNode.AppendChild($NewPolicyElement)
+        $ExistingPolicyElement.ParentNode.RemoveChild($ExistingPolicyElement)
 
-    $PoliciesXml.Save($TemporaryFile.FullName)
+        $PoliciesXml.Save($TemporaryFile.FullName)
 
-    Add-PVFile -safe PVWAConfig -folder root -file 'Policies.xml' -localFolder $TemporaryFile.DirectoryName -localFile $TemporaryFile.Name
+        Add-PVFile -safe PVWAConfig -folder root -file 'Policies.xml' -localFolder $TemporaryFile.DirectoryName -localFile $TemporaryFile.Name
+    } else {
+        throw "Platform $PlatformId not found in Policies.xml"
+    }
     Close-PVSafe -safe PVWAConfig
+
+    return $PoliciesXml
 }
