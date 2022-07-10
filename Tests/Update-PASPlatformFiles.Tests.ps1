@@ -8,8 +8,6 @@
     Mock -CommandName Add-PVFile
     Mock -CommandName Close-PVSafe
     Mock -CommandName Find-PVFile -MockWith { $true }
-
-    $VaultCredential = New-Object System.Management.Automation.PSCredential ('username', (ConvertTo-SecureString -String 'password' -AsPlainText -Force))
 }
 
 Describe 'Update-PASPlatformFiles' {
