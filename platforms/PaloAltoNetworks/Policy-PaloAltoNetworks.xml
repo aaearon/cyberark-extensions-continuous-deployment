@@ -6,7 +6,9 @@
 			  <Property Name="Username" />
 			  <Property Name="Address" />
 			</Required>
-			<Optional />
+			<Optional>
+				<Property Name="Banana" />
+			</Optional
 			</Properties>
 			<LinkedPasswords>
 				<Link Name="ReconcileAccount" DisplayName="Reconcile Account" PropertyIndex="3" />
