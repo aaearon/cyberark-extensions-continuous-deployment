@@ -3,10 +3,6 @@
 function Update-PASPlatformFiles {
     [CmdletBinding()]
     param (
-        $PacliClientPath,
-        $VaultAddress,
-        $VaultCredential,
-
         [Parameter(Mandatory = $false)]
         [string]
         $PlatformId,
@@ -20,15 +16,10 @@ function Update-PASPlatformFiles {
     )
 
     begin {
-        Set-PVConfiguration -ClientPath $PacliClientPath
-        Start-PVPacli
-        New-PVVaultDefinition -vault $VaultAddress -address $VaultAddress -ErrorAction SilentlyContinue
-        Connect-PVVault -user $($VaultCredential.UserName) -password $($VaultCredential.Password)
         Open-PVSafe -safe PasswordManagerShared
     }
 
     process {
-
 
             if ($null -eq $PlatformId -or $PlatformId -eq "") {
                 $PlatformId = (Get-Item $Path).Name
@@ -66,8 +57,6 @@ function Update-PASPlatformFiles {
     }
     end {
         Close-PVSafe -safe PasswordManagerShared
-        Disconnect-PVVault
-        Stop-PVPacli
     }
 }
 
