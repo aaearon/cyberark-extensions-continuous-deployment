@@ -26,7 +26,7 @@ function Update-PASPlatformFiles {
         }
 
         # Throw an error if the platform does not already exist in the Vault as adding the files effectively do nothing.
-        if ($null -eq (Find-PVFile -safe PasswordManagerShared -folder root\Policies -filePattern "Policy-PlatformId.ini")) {
+        if ($null -eq (Find-PVFile -safe PasswordManagerShared -folder root\Policies -filePattern "Policy-$PlatformId.ini")) {
             throw "Platform $PlatformId not found in Vault. Aborting."
         }
 
