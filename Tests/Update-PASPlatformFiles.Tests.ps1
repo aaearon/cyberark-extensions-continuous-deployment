@@ -72,13 +72,13 @@ Describe 'Update-PASPlatformFiles' {
         }
     }
 
+    It 'writes an error if the platform is not found in the Vault' {
+        Mock -CommandName Find-PVFile -MockWith { $null }
+
+        { Update-PASPlatformFiles -PlatformId banana -Path $PlatformDirectory } | Should -throw "Platform banana not found in Vault. Aborting."
+    }
+
     Context 'when updating existing platforms' {
-
-        It 'must throw an exception if the platform is not found in the Vault' {
-            Mock -CommandName Find-PVFile -MockWith { $null }
-
-            { Update-PASPlatformFiles -PlatformId banana -Path $PlatformDirectory } | Should -throw "Platform banana not found in Vault. Aborting."
-        }
 
         It 'must add the CPM policy file to the Vault' {
             Update-PASPlatformFiles -PlatformId $PlatformId -Path $PlatformDirectory
