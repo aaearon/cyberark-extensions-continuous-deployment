@@ -14,6 +14,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Checkout tools repo
+        uses: actions/checkout@v3
+        with:
+          repository: aaearon/deploy-pasextensions
+          path: deploy-pasextensions
+
       - name: Uploads CPM files to the Vault
         shell: powershell
         run: |
