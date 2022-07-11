@@ -1,14 +1,16 @@
 name: Deploy platform to CyberArk on release
 
 on:
-  release:
-    types: [published]
+  pull_request:
+    branches: [main]
+    types: [closed]
   workflow_dispatch:
 
 jobs:
   deploy:
     name: Deploy CPM files to the Vault
     runs-on: self-hosted
+    if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v3
 
