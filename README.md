@@ -6,7 +6,7 @@ See the accompanying blog post about doing continuous deployment with CPM plugin
 
 ## How it works
 
-Any time a release is created on GitHub, all the files for all the platforms under the `platforms` folder are deployed to the Vault defined in `deploy.ps1`. This can be tweaked in `platform-deploy.yml`.
+Any time a release is created on GitHub, all the files for all the platforms under the `platforms` folder are deployed to the Vault defined in `deploy.ps1` with the help of [Deploy-PASExtensions](https://github.com/aaearon/Deploy-PASExtensions). This can be tweaked in `platform-deploy.yml`.
 
 The two required platform files (CPM policy file and PVWA settings file) must be named `Policy-$PlatformId.ini` and `Policy-$PlatformId.xml` accordingly. Both files must be in a folder under `platforms` whose name must match the PlatformId (defined as `PolicyID` in `Policy-$PlatformId.ini` and the `ID` attribute in `Policy-$PlatformId.xml` in the appropriate element). Any optional files included in the folder will be uploaded to the Vault as long as the platform was imported through the PVWA or REST API.
 
