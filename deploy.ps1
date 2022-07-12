@@ -6,7 +6,7 @@
 )
 
 Import-Module PoShPACLI
-Import-Module ..\deploy-pasextensions\Deploy-PASExtensions\Deploy-PASExtensions.psd1
+Import-Module .\deploy-pasextensions\Deploy-PASExtensions\Deploy-PASExtensions.psd1
 
 Set-PVConfiguration -ClientPath $PACLIClientPath
 Start-PVPacli
