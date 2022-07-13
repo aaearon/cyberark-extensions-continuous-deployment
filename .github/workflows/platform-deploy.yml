@@ -1,4 +1,4 @@
-name: Deploy platform to CyberArk on release
+name: Deploy platform files to CyberArk
 
 on:
   push:
@@ -6,18 +6,18 @@ on:
 
 jobs:
   deploy:
-    name: Deploy CPM files to the Vault
+    name: Deploy platform files to the Vault
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
 
-      - name: Checkout tools repo
+      - name: Checkout Deploy-PASExtensions repo
         uses: actions/checkout@v3
         with:
           repository: aaearon/deploy-pasextensions
           path: deploy-pasextensions
 
-      - name: Uploads CPM files to the Vault
+      - name: Uploads platform files to the Vault
         shell: powershell
         run: |
           $env:HOMEDRIVE = ""
